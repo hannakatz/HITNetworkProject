@@ -1,4 +1,5 @@
 
+
 import java.util.*;
 
 public class Matrix {
@@ -88,6 +89,23 @@ public class Matrix {
         try{
             extracted = primitiveMatrix[index.row][index.column-1];
             list.add(new Index(index.row,index.column-1));
+        }catch (ArrayIndexOutOfBoundsException ignored){}
+
+        try{
+            extracted = primitiveMatrix[index.row+1][index.column+1];
+            list.add(new Index(index.row+1,index.column+1));
+        }catch (ArrayIndexOutOfBoundsException ignored){}
+        try{
+            extracted = primitiveMatrix[index.row-1][index.column+1];
+            list.add(new Index(index.row-1,index.column+1));
+        }catch (ArrayIndexOutOfBoundsException ignored){}
+        try{
+            extracted = primitiveMatrix[index.row-1][index.column-1];
+            list.add(new Index(index.row-1,index.column-1));
+        }catch (ArrayIndexOutOfBoundsException ignored){}
+        try{
+            extracted = primitiveMatrix[index.row+1][index.column-1];
+            list.add(new Index(index.row+1,index.column-1));
         }catch (ArrayIndexOutOfBoundsException ignored){}
         return list;
     }

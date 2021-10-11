@@ -67,6 +67,14 @@ public class MatrixIHandler implements IHandler {
                         objectOutputStream.writeObject(reachables);
                     }
                 }
+                case "groupsOfOnes":
+                    Index tempIndex = (Index)objectInputStream.readObject();
+                    if(this.matrix!=null){
+                        List<Index> reachables = new ArrayList<>(this.matrix.getReachables(tempIndex));
+                        System.out.println("Server: neighbors of "+ tempIndex + ":  " + reachables);
+                        // send to socket's outputstream
+                        objectOutputStream.writeObject(reachables);
+                    }
 
                 case "stop":{
                     doWork = false;
