@@ -121,6 +121,19 @@ public class Matrix {
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Matrix matrix = (Matrix) o;
+        return Arrays.equals(primitiveMatrix, matrix.primitiveMatrix);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(primitiveMatrix);
+    }
+
     public final int[][] getPrimitiveMatrix() {
         return primitiveMatrix;
     }

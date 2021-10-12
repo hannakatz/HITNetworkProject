@@ -9,11 +9,17 @@ import java.util.Objects;
 public class Node<T> {
     private T data;
     private Node<T> parent;
+    private  int number;
 
 
     public Node(T someObject, final Node<T> discoveredBy){
         this.data = someObject;
         this.parent = discoveredBy;
+    }
+    public Node(T someObject, final Node<T> discoveredBy,int index){
+        this.data = someObject;
+        this.parent = discoveredBy;
+        this.number = index;
     }
 
     public Node(T someObject){
@@ -38,6 +44,14 @@ public class Node<T> {
 
     public void setParent(Node<T> parent) {
         this.parent = parent;
+    }
+
+    public  int getNumber() {
+        return this.number;
+    }
+
+    public  void setNumber(int number) {
+        this.number = number;
     }
 
     /*
