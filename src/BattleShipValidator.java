@@ -5,7 +5,7 @@ public class BattleShipValidator {
 
     }
 
-    public int numberOfGoodShips(int[][] myArray) {
+    public int numberOfGoodShips(Matrix myArray) {
 
         ArrayList<HashSet<Index>> results = new ArrayList<HashSet<Index>>();
         HashMap<Integer, HashSet<Index>> map = new HashMap<>();
@@ -16,87 +16,50 @@ public class BattleShipValidator {
 
         List<Index> connectedComponent = null;
 
-        for (int i = 0; i < myArray.length; i++) {
-            for (int j = 0; j < myArray.length; j++) {
-                if (myArray[i][j] == 1) {
-                    myMatrixGraph = new TraversableMatrix(new Matrix(myArray));
+        for (int i = 0; i < myArray.primitiveMatrix.length; i++) {
+            for (int j = 0; j < myArray.primitiveMatrix.length; j++) {
+                if (myArray.primitiveMatrix[i][j] == 1) {
+                    myMatrixGraph = new TraversableMatrix(new Matrix(myArray.primitiveMatrix));
                     myMatrixGraph.setStartIndex(new Index(i, j));
                     dfsVisit = new DfsVisit<>();
                     connectedComponent = dfsVisit.traverse(myMatrixGraph);
-                    boolean isHorizontalShip = false;
-                    boolean isVerticalShip = false;
-                    boolean isDiagonalShip = false;
-                    boolean b1 = false;
-                    boolean b2 = false;
-                    boolean b3 = false;
-                    boolean b4 = false;
-
-                    Index index = connectedComponent.get(0);
-                    try {
-                        if (myArray[index.row][index.column + 1] == 1 || myArray[index.row][index.column - 1] == 1) {
-                            isHorizontalShip = true;
-                        }
-                    } catch (ArrayIndexOutOfBoundsException ignored) {
-                    }
-
-                    try {
-                        if (myArray[index.row + 1][index.column] == 1 || myArray[index.row - 1][index.column] == 1) {
-                            isVerticalShip = true;
-                        }
-                    } catch (ArrayIndexOutOfBoundsException ignored) {
-                    }
-
-                    try {
-                        if (myArray[index.row + 1][index.column + 1] == 1 || myArray[index.row - 1][index.column - 1] == 1 || myArray[index.row - 1][index.column + 1] == 1 || myArray[index.row + 1][index.column + -1] == 1) {
-                            isDiagonalShip = true;
-                        }
-                    } catch (ArrayIndexOutOfBoundsException ignored) {
-                    }
-
-                    if (isHorizontalShip == true && isVerticalShip == true && isDiagonalShip == false) {
+                    if(connectedComponent.size() == 1){
                         continue;
-                    } else if (isHorizontalShip == true && isVerticalShip == true && isDiagonalShip == true) {
-
-                        if(i + 1 == myArray.length || j + 1 == myArray.length || i - 1 < 0 || j - 1 < 0 ){
-                            continue;
+                    }
+                    int maxX = 0;
+                    int maxY = 0;
+                    int minX = connectedComponent.get(0).column;
+                    int minY = connectedComponent.get(0).row;
+                    for (Index index : connectedComponent) {
+                        if (index.row > maxY) {
+                            maxY = index.row;
                         }
-                        if (myArray[index.row + 1][index.column + 1] == 1) {
-                            b1 = isPossibleHorizontalShip(myArray, i, j) && isPossibleVerticalShip(myArray, i, j) && isPossibleHorizontalShip(myArray, i + 1, j + 1) &&
-                                    isPossibleVerticalShip(myArray, i + 1, j + 1);
+                        if (index.row < minY) {
+                            minY = index.row;
                         }
-
-                        if (myArray[index.row - 1][index.column - 1] == 1) {
-                            b2 = isPossibleHorizontalShip(myArray, i, j) && isPossibleVerticalShip(myArray, i, j) && isPossibleHorizontalShip(myArray, i - 1, j + 1) &&
-                                    isPossibleVerticalShip(myArray, i - 1, j + 1);
+                        if (index.column > maxX) {
+                            maxX = index.column;
                         }
-
-                        if (myArray[index.row + 1][index.column - 1] == 1) {
-                            b3 = isPossibleHorizontalShip(myArray, i, j) && isPossibleVerticalShip(myArray, i, j) && isPossibleHorizontalShip(myArray, i + 1, j - 1) &&
-                                    isPossibleVerticalShip(myArray, i + 1, j - 1);
-                        }
-
-                        if (myArray[index.row - 1][index.column + 1] == 1) {
-                            b4 = isPossibleHorizontalShip(myArray, i, j) || isPossibleVerticalShip(myArray, i, j) || isPossibleHorizontalShip(myArray, i - 1, j + 1) ||
-                                    isPossibleVerticalShip(myArray, i - 1, j + 1);
-                        }
-                        if (b1 == true && b2 == true && b3 == true && b4 == true) {
-                            count++;
-                        }
-                    } else if (isHorizontalShip == true) {
-                        boolean b = isPossibleHorizontalShip(myArray, i, j);
-                        if (b == true) {
-                            count++;
-                        }
-                    } else if (isVerticalShip == true) {
-                        boolean b = isPossibleVerticalShip(myArray, i, j);
-                        if (b == true) {
-                            count++;
+                        if (index.column < minX) {
+                            minX = index.column;
                         }
                     }
-                    myArray = changeArrayValues(myArray,connectedComponent);
+                    boolean isShip = true;
+                    for (int x = minX; x <= maxX; x++) {
+                        for (int y = minY; y <= maxY; y++) {
+                            if (myArray.primitiveMatrix[y][x] == 0) {
+                                isShip = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    if(isShip == true){
+                        count++;
+                    }
+                    myArray.primitiveMatrix = changeArrayValues(myArray.primitiveMatrix, connectedComponent);
                 }
             }
-
         }
 
         System.out.println(count);
@@ -112,134 +75,15 @@ public class BattleShipValidator {
         return array;
     }
 
-    private boolean isPossibleHorizontalShip(int[][] array, int row, int col) {
-        if(row - 1 < 0){
-            if(array[row + 1][col] == 0){
-                return isPossibleHorizontalShipRight(array, row, col + 1) && isPossibleHorizontalShipLeft(array, row, col - 1);
-            }
-        }
-        if(row + 1 > array.length){
-            if(array[row - 1][col] == 0){
-                return isPossibleHorizontalShipRight(array, row, col + 1) && isPossibleHorizontalShipLeft(array, row, col - 1);
-            }
-        }
-        if(array[row + 1][col] == 0 && array[row - 1][col] == 0) {
-            return isPossibleHorizontalShipRight(array, row, col + 1) && isPossibleHorizontalShipLeft(array, row, col - 1);
-        }
-        return false;
-    }
-
-    private boolean isPossibleVerticalShip(int[][] array, int row, int col) {
-        if(col + 1 > array.length){
-            if(array[row ][col -1] == 0){
-                return isPossibleVerticalShipUp(array, row + 1, col) && isPossibleVerticalShipDown(array, row - 1, col);
-            }
-        }
-        if(col -1 < 0){
-            if(array[row ][col + 1] == 0){
-                return isPossibleVerticalShipUp(array, row + 1, col) && isPossibleVerticalShipDown(array, row - 1, col);
-            }
-        }
-
-        if(array[row][col + 1] == 0 && array[row][col - 1] == 0) {
-            return isPossibleVerticalShipUp(array, row + 1, col) && isPossibleVerticalShipDown(array, row - 1, col);
-        }
-        return false;
-    }
-
-    private boolean isPossibleVerticalShipUp(int[][] array, int row, int col) {
-        if (row  == array.length || row  < 0 || array[row][col] == 0 ) {
-            return true;
-        }
-        else if(col + 1 > array.length){
-            if(array[row ][col -1] == 0){
-                return isPossibleVerticalShipUp(array, row + 1, col );
-            }
-        }
-        else if(col -1 < 0){
-            if(array[row ][col + 1] == 0){
-               return isPossibleVerticalShipUp(array, row + 1, col );
-            }
-        }
-
-        else if (array[row][col + 1] == 0 && array[row][col - 1] == 0) {
-           return isPossibleVerticalShipUp(array, row + 1, col );
-        }
-        return false;
-    }
-
-    private boolean isPossibleVerticalShipDown(int[][] array, int row, int col) {
-        if (row  == array.length || row  < 0 || array[row][col] == 0 ) {
-            return true;
-        }
-        if(col + 1 > array.length){
-            if(array[row ][col -1] == 0){
-                return isPossibleVerticalShipDown(array, row - 1, col );
-            }
-        }
-        if(col -1 < 0){
-            if(array[row ][col + 1] == 0){
-               return isPossibleVerticalShipDown(array, row - 1, col );
-            }
-        }
-        if (array[row][col + 1] == 0 && array[row][col - 1] == 0) {
-           return isPossibleVerticalShipDown(array, row - 1, col );
-        }
-        return false;
-    }
-
-    private boolean isPossibleHorizontalShipLeft(int[][] array, int row, int col) {
-        if (col  == array.length || col  < 0 || array[row][col] == 0 ) {
-            return true;
-        }
-        if(row + 1 > array.length){
-            if(array[row ][col -1] == 0){
-                return isPossibleHorizontalShipLeft(array, row, col - 1 );
-            }
-        }
-        if(row -1 < 0){
-            if(array[row ][col + 1] == 0){
-                return isPossibleHorizontalShipLeft(array, row, col - 1 );
-            }
-        }
-        if (array[row + 1][col] == 0 && array[row - 1][col] == 0) {
-           return isPossibleHorizontalShipLeft(array, row, col - 1 );
-        }
-        return false;
-    }
-
-
-    private boolean isPossibleHorizontalShipRight(int[][] array, int row, int col) {
-        if (col  == array.length || col  < 0 || array[row][col] == 0 ) {
-            return true;
-        }
-        if(row + 1 > array.length){
-            if(array[row ][col -1] == 0){
-                return  isPossibleHorizontalShipLeft(array, row, col + 1);
-            }
-        }
-        if(row -1 < 0){
-            if(array[row ][col + 1] == 0){
-                return  isPossibleHorizontalShipLeft(array, row, col + 1);
-            }
-        }
-        if (array[row + 1][col] == 0 && array[row - 1][col] == 0) {
-            return isPossibleHorizontalShipLeft(array, row, col + 1);
-        }
-        return false;
-    }
-
     public static void main (String[]args){
         int[][] source = {
-                {1, 0, 1, 1, 0},
-                {1, 0, 1, 1, 0},
-                {1, 0, 0, 0, 0},
-                {1, 0, 1, 0, 0},
-                {1, 0, 1, 0, 0}};
+                {1, 1, 1, 1, 1},
+                {1, 1, 1, 1, 1},
+                {0, 0, 0, 0, 0},
+                {1, 0, 1, 0, 1},
+                {1, 0, 1, 1, 1}};
 
-        int matrix = new BattleShipValidator().numberOfGoodShips(source);
+        int matrix = new BattleShipValidator().numberOfGoodShips(new Matrix(source));
     }
-
-
 }
 
